@@ -21,7 +21,16 @@ def __repr__(self):
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
+    app.logger.info("this log portrays a message about sth")
+    app.logger.debug("this log provides a diagnostic information")
+    app.logger.error("this log represents a failure of the code")
+    app.logger.warning("this log indicates that there might be a problem")
+    app.logger.fatal("this log represents catastrophic situations")
+    
+
     if request.method =='POST':
+      app.logger.info("the request method was a post")
+
       task_content=request.form['content']
       new_task=Todo(content=task_content)
 
@@ -32,12 +41,15 @@ def index():
       except:
         return 'There was an issue adding your task'    
     else:
+        app.logger.info("the request method was %s",request.method)
+
         tasks = Todo.query.order_by(Todo.date_created).all()
         return render_template('index.html',tasks=tasks) 
 
 
 @app.route('/delete/<int:id>')
 def delete(id):
+    app.logger.info("About to delete record with id %s",id)
     task_to_delete = Todo.query.get_or_404(id)
 
     try:
@@ -49,10 +61,13 @@ def delete(id):
 
 @app.route('/update/<int:id>', methods=['GET','POST'])
 def update(id):
+    app.logger.info("About to update record with id %s",id )
     task = Todo.query.get_or_404(id)
 
     if request.method =='POST':
         task.content = request.form['content']
+        app.logger.info("about to update record with content %s",task.content)
+        
 
         try:
             db.session.commit()
@@ -63,5 +78,6 @@ def update(id):
     else:
         return render_template('update.html', task=task )
 if __name__ == "__main__":
-    app.run(debug=True)  
+    app.run(debug=True) 
+
   
